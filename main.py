@@ -1,3 +1,4 @@
+from Lectura import Lectura_De_Archivo
 def menu():
     while True:
         print("-------------------------------------------------------")
@@ -10,7 +11,8 @@ def menu():
         print("3. Salir")
         entrada = input("Ingrese una opción: ")
         if entrada == "1":
-            Ruta = input("Ingrese la ruta del archivo")
+            Ruta = input("Ingrese la ruta del archivo: ")
+            Lectura_De_Archivo(Ruta)
             input()
         if entrada == "2":
             print("Trabajamos en ello ;)")
