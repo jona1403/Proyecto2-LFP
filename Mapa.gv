@@ -1,0 +1,33 @@
+digraph Mapa {
+	rankdir=LR size=8
+	"->0" [label="->0
+" shape=diamond]
+	"->1" [label="->1
+" shape=diamond]
+	"->0" -> "->1"
+	"->2" [label="->2
+" shape=diamond]
+	"->1" -> "->2"
+	"->3" [label="->3
+" shape=diamond]
+	"->2" -> "->3"
+	"->4" [label="->4
+" shape=diamond]
+	"->3" -> "->4"
+	"->5" [label="->5
+" shape=diamond]
+	"->4" -> "->5"
+	"->6" [label="->6
+" shape=diamond]
+	"->5" -> "->6"
+	"->7" [label="->7
+" shape=diamond]
+	"->6" -> "->7"
+	"->8" [label="->8
+" shape=diamond]
+	"->7" -> "->8"
+	"->9" [label="->9
+" shape=diamond]
+	"->8" -> "->9"
+	label=DIGITOS0123456789
+}

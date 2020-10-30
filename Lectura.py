@@ -1,4 +1,4 @@
-from Clases import Lista, NodoLista, NodosLista
+from Clases import Lista, NodoLista, RevisionForma, RevisionColor
 from GraficarLista import GraficarListas
 import re
 def Lectura_De_Archivo(Ruta):
@@ -72,7 +72,11 @@ def Lectura_De_Archivo(Ruta):
                     Estado_Cadena = "forma_lista"
                 elif char == "," and Estado_Cadena == "forma_lista" and NombreLista !="":
                     Estado_Cadena = "ninguno"
-                    FormaLista = Cadena
+                    FormaLista = RevisionForma(Cadena)
+                    if FormaLista == "nomatch":
+                        print("La forma ingresada por el usuario no es valida")
+                    else:
+                        pass
                     Cadena = ""
                 elif Estado_Cadena == "ninguno" and FormaLista != "":
                     Estado_Cadena = "lista_doble"
@@ -133,14 +137,14 @@ def Lectura_De_Archivo(Ruta):
                 elif Estado_Cadena == "color_nodo" and char == ";":
                     if CantidadNodos == 0:
                         Estado_Cadena = "apertura_nodos"
-                        ListaDeNodos.append(NodoLista(NombreNodos, Cadena))
+                        ListaDeNodos.append(NodoLista(NombreNodos, RevisionColor(Cadena)))
                         NombreNodos = ""
                         CantidadNodos = 0
                         Cadena = ""
                     else:
                         Estado_Cadena = "apertura_nodos"
                         for i in range(1 , CantidadNodos+1):
-                            ListaDeNodos.append(NodoLista(NombreNodos+str(i), Cadena))
+                            ListaDeNodos.append(NodoLista(NombreNodos+str(i), RevisionColor(Cadena)))
                         NombreNodos = ""
                         CantidadNodos = 0
                         Cadena = ""
@@ -159,13 +163,13 @@ def Lectura_De_Archivo(Ruta):
                         Estado_Cadena = "color_nodo"
                         Cadena = ""
                 elif Estado_Cadena == "color_nodo" and char == ";":
-                    ListaDeNodos.append(NodoLista(NombreNodos, Cadena))
+                    NodoDefecto = NodoLista(NombreNodos, RevisionColor(Cadena))
                     Estado_Cadena = "ninguno"
                     NombreNodos = ""
                     CantidadNodos = 0
                     Cadena = ""
                     ListaDeListas.append(Lista(NombreLista, FormaLista, DobleLista, ListaDeNodos))
-                    GraficarListas(ListaDeListas)
+                    GraficarListas(ListaDeListas, NodoDefecto)
             elif Estado_Tipo == "matriz":
                 pass
             elif Estado_Tipo == "tabla":

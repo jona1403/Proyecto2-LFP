@@ -1,0 +1,33 @@
+digraph Lista {
+	rankdir=LR size=12
+	"->0" [label="->0
+" fillcolor="#ffff00" shape=diamond style=filled]
+	"->1" [label="->1
+" fillcolor="#ffdf00" shape=diamond style=filled]
+	"->0" -> "->1"
+	"->2" [label="->2
+" fillcolor="#ffdf00" shape=diamond style=filled]
+	"->1" -> "->2"
+	"->3" [label="->3
+" fillcolor="#ffdf00" shape=diamond style=filled]
+	"->2" -> "->3"
+	"->4" [label="->4
+" fillcolor="#ffdf00" shape=diamond style=filled]
+	"->3" -> "->4"
+	"->5" [label="->5
+" fillcolor="#ffdf00" shape=diamond style=filled]
+	"->4" -> "->5"
+	"->6" [label="->6
+" fillcolor="#ffdf00" shape=diamond style=filled]
+	"->5" -> "->6"
+	"->7" [label="->7
+" fillcolor="#ffdf00" shape=diamond style=filled]
+	"->6" -> "->7"
+	"->8" [label="->8
+" fillcolor="#ffdf00" shape=diamond style=filled]
+	"->7" -> "->8"
+	"->9" [label="->9
+" fillcolor="#ffdf00" shape=diamond style=filled]
+	"->8" -> "->9"
+	label=DIGITOS0123456789
+}
