@@ -13,6 +13,7 @@ class Matriz:
         self.nombre = nombre
         self.forma = forma
         self.matrizdoble = matrizdoble
+        self.listanodos = listanodos
 
 class Tabla:
     def __init__(self, columnas, nombre):
