@@ -1,9 +1,11 @@
 from Clases import Lista, NodoLista, RevisionForma, RevisionColor
 from Clases import Matriz, NodoMatriz, FilaMatriz
 from GraficarLista import GraficarListas
+from GraficarMatriz import GraficaMatriz
 import re
 def Lectura_De_Archivo(Ruta):
     ListaDeListas = []
+    ListaDeMatrices = []
     DobleLista = False
     NombreLista = ""
     FormaLista = ""
@@ -15,6 +17,7 @@ def Lectura_De_Archivo(Ruta):
     ListaDeNombresMatriz = []
     x_matriz = 0
     y_matriz = 0
+    y = 0
     ListaNodosMatriz = []
     ListaDeNodos = []
     CantidadNodos = 0
@@ -293,11 +296,6 @@ def Lectura_De_Archivo(Ruta):
                         Cadena = ""
                         if char == ")":
                             Estado_Cadena = "color_nodo"
-
-
-
-
-
                 elif Estado_Cadena == "color_nodo" and char == ";":
                     if len(ListaDeNombresMatriz) == 1:
                         Estado_Cadena = "apertura_nodos"
@@ -309,19 +307,40 @@ def Lectura_De_Archivo(Ruta):
                         ListaDeNombresMatriz = []
                         Cadena = ""
                     else:
+                        y+=1
+                        x = 0
                         Estado_Cadena = "apertura_nodos"
                         for i in ListaDeNombresMatriz:
+                            x += 1
                             if Cadena == "#":
-                                ListaDeNodos.append(NodoLista(NombreNodos+str(i), Cadena))
+                                ListaNodosMatriz.append(NodoMatriz(x, y, i, Cadena))
                             else:
-                                ListaDeNodos.append(NodoLista(NombreNodos+str(i), RevisionColor(Cadena)))
+                                ListaNodosMatriz.append(NodoMatriz(x, y, i, RevisionColor(Cadena)))
                         NombreNodos = ""
                         ListaDeNombresMatriz = []
                         Cadena = ""
-
-
-
-
-
+            if Estado_Tipo == "defecto_matriz" and ListaNodosMatriz != []:
+                if re.match(PatternDefecto, Cadena):
+                    Estado_Cadena = "defecto_nodo"
+                    Cadena = ""
+                elif Estado_Cadena == "defecto_nodo" and NombreNodos == "":
+                    if (ord(char) == 34 or ord(char) == 39):
+                        Estado_Cadena = "nombre_nodo"
+                        Cadena = ""
+                elif Estado_Cadena == "nombre_nodo":
+                    if (ord(char) == 34 or ord(char) == 39):
+                        NombreNodos = Cadena
+                        Estado_Cadena = "color_nodo"
+                        Cadena = ""
+                elif Estado_Cadena == "color_nodo" and char == ";":
+                    NodoDefecto = NodoLista(NombreNodos, RevisionColor(Cadena))
+                    Estado_Cadena = "ninguno"
+                    Estado_Tipo = "ninguno"
+                    NombreNodos = ""
+                    CantidadNodos = 0
+                    Cadena = ""
+                    ListaDeMatrices.append(Matriz(FilasMatriz, ColumnasMatriz, NombreMatriz, FormaMatriz, DobleMatriz, ListaNodosMatriz))
+                    ListaDeListas.append(Lista(NombreLista, FormaLista, DobleLista, ListaDeNodos))
+                    GraficaMatriz(ListaDeMatrices, NodoDefecto)
             elif Estado_Tipo == "tabla":
                 pass

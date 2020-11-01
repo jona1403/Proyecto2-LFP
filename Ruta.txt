@@ -1,6 +1,6 @@
-lista ('>>> Personas <<<',circulo,verdadero){
-    nodo ('Luis') azul2 ;
-    nodos (2, 'Persona') verde2;
-    nodo (#) #; // Nodo con valores por defecto
-    nodo ('Manuel') rojo2;
-} defecto ('Disponible') blanco;
+matriz (4,4,'((( Frutas )))',rectangulo,falso){
+    fila ('Uvas', 'Arandanos') morado2;
+    fila ('Sandias',#,'Manzanas')rojo2;
+    nodo (3,3,'Piñas')#;
+    nodo (4,4,'Mango') anaranjado2;
+} defecto ('Disponible') amarillo2;

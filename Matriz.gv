@@ -1,0 +1,36 @@
+digraph Matriz {
+	rankdir=LR size=8
+	11 [label=Uvas
+ fillcolor="#8e6995" shape=rect style=filled]
+	21 [label=Arandanos
+ fillcolor="#8e6995" shape=rect style=filled]
+	31 [label=Disponible
+ fillcolor="#ffff00" shape=rect style=filled]
+	41 [label=Disponible
+ fillcolor="#ffff00" shape=rect style=filled]
+	12 [label=Sandias
+ fillcolor="#ff0000" shape=rect style=filled]
+	22 [label=Disponible
+ fillcolor="#ff0000" shape=rect style=filled]
+	32 [label=Manzanas
+ fillcolor="#ff0000" shape=rect style=filled]
+	42 [label=Disponible
+ fillcolor="#ffff00" shape=rect style=filled]
+	13 [label=Disponible
+ fillcolor="#ffff00" shape=rect style=filled]
+	23 [label=Disponible
+ fillcolor="#ffff00" shape=rect style=filled]
+	33 [label="PiÃ±as
+" fillcolor="#ffff00" shape=rect style=filled]
+	43 [label=Disponible
+ fillcolor="#ffff00" shape=rect style=filled]
+	14 [label=Disponible
+ fillcolor="#ffff00" shape=rect style=filled]
+	24 [label=Disponible
+ fillcolor="#ffff00" shape=rect style=filled]
+	34 [label=Disponible
+ fillcolor="#ffff00" shape=rect style=filled]
+	44 [label=Mango
+ fillcolor="#ff6600" shape=rect style=filled]
+	label=Frutas
+}

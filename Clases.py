@@ -7,9 +7,9 @@ class Lista:
         self.listanodos = listanodos
 
 class Matriz:
-    def __init__(self, filas, colmnas, nombre, forma, matrizdoble, listanodos):
+    def __init__(self, filas, columnas, nombre, forma, matrizdoble, listanodos):
         self.filas = filas
-        self.columnas = colmnas
+        self.columnas = columnas
         self.nombre = nombre
         self.forma = forma
         self.matrizdoble = matrizdoble
