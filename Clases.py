@@ -16,9 +16,15 @@ class Matriz:
         self.listanodos = listanodos
 
 class Tabla:
-    def __init__(self, columnas, nombre):
+    def __init__(self, columnas, nombre, listafilas):
         self.columnas = columnas
         self.nombre = nombre
+        self.listafilas = listafilas
+
+class filatabla:
+    def __init__(self, listanombres, color):
+        self.listanombres = listanombres
+        self.color = color
 
 class NodoLista:
     def __init__(self, nombre, color):

@@ -1,6 +1,7 @@
-matriz (4,4,'((( Frutas )))',rectangulo,falso){
-    fila ('Uvas', 'Arandanos') morado2;
-    fila ('Sandias',#,'Manzanas')rojo2;
-    nodo (3,3,'Piñas')#;
-    nodo (4,4,'Mango') anaranjado2;
-} defecto ('Disponible') amarillo2;
+tabla (3,'** Equipos **'){
+    fila ('Equipo 1', 'Azul', '7') Azul2;
+    fila ('Disponible', 'a', 'd') #;
+    fila ('Equipo 3', 'Rojo', 'a') Rojo2;
+    fila ('Equipo 4',"a",'6')#;
+    encabezados ('Equipo','Color Asignado','No. Integrantes') amarillo2;
+} defecto ('---') gris2;

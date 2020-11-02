@@ -8,6 +8,9 @@ digraph Matriz {
  fillcolor="#ffff00" shape=rect style=filled]
 	41 [label=Disponible
  fillcolor="#ffff00" shape=rect style=filled]
+	11 -> 21
+	21 -> 31
+	31 -> 41
 	12 [label=Sandias
  fillcolor="#ff0000" shape=rect style=filled]
 	22 [label=Disponible
@@ -16,6 +19,9 @@ digraph Matriz {
  fillcolor="#ff0000" shape=rect style=filled]
 	42 [label=Disponible
  fillcolor="#ffff00" shape=rect style=filled]
+	12 -> 22
+	22 -> 32
+	32 -> 42
 	13 [label=Disponible
  fillcolor="#ffff00" shape=rect style=filled]
 	23 [label=Disponible
@@ -24,6 +30,9 @@ digraph Matriz {
 " fillcolor="#ffff00" shape=rect style=filled]
 	43 [label=Disponible
  fillcolor="#ffff00" shape=rect style=filled]
+	13 -> 23
+	23 -> 33
+	33 -> 43
 	14 [label=Disponible
  fillcolor="#ffff00" shape=rect style=filled]
 	24 [label=Disponible
@@ -32,5 +41,20 @@ digraph Matriz {
  fillcolor="#ffff00" shape=rect style=filled]
 	44 [label=Mango
  fillcolor="#ff6600" shape=rect style=filled]
+	14 -> 24
+	24 -> 34
+	34 -> 44
+	11 -> 12
+	12 -> 13
+	13 -> 14
+	21 -> 22
+	22 -> 23
+	23 -> 24
+	31 -> 32
+	32 -> 33
+	33 -> 34
+	41 -> 42
+	42 -> 43
+	43 -> 44
 	label=Frutas
 }

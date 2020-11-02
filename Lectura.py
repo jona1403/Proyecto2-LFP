@@ -1,11 +1,14 @@
 from Clases import Lista, NodoLista, RevisionForma, RevisionColor
-from Clases import Matriz, NodoMatriz, FilaMatriz
+from Clases import Matriz, NodoMatriz
+from Clases import Tabla, filatabla
 from GraficarLista import GraficarListas
 from GraficarMatriz import GraficaMatriz
+from GraficarTabla import GraficarTablas
 import re
 def Lectura_De_Archivo(Ruta):
     ListaDeListas = []
     ListaDeMatrices = []
+    ListaDeTablas = []
     DobleLista = False
     NombreLista = ""
     FormaLista = ""
@@ -18,11 +21,16 @@ def Lectura_De_Archivo(Ruta):
     x_matriz = 0
     y_matriz = 0
     y = 0
+    Encabezado = []
     ListaNodosMatriz = []
     ListaDeNodos = []
     CantidadNodos = 0
     NombreNodos = ""
     Cadena = ""
+    ColumnasTabla = 0
+    NombreTabla = ""
+    ListaDeFilasTabla = []
+    ListaDeNombresFila = []
     Estado_Tipo = "ninguno"
     Estado_Cadena = "ninguno"
     Estado_Comentario = False
@@ -36,6 +44,7 @@ def Lectura_De_Archivo(Ruta):
     PatternNodos = r"[N|n][O|o][D|d][O|o][S|s]"
     PatternDefecto = r"[D|d][E|e][F|f][E|e][C|c][T|t][O|o]"
     PatternNumeros = r"[0-9]*"
+    PatternEncabezados = r"[E|e][N|n][C|c][A|a][B|b][E|e][Z|z][A|a][D|d][O|o][S|s]"
     Fila = 0
     Columna = 0
     file = open(Ruta, "r")
@@ -340,7 +349,119 @@ def Lectura_De_Archivo(Ruta):
                     CantidadNodos = 0
                     Cadena = ""
                     ListaDeMatrices.append(Matriz(FilasMatriz, ColumnasMatriz, NombreMatriz, FormaMatriz, DobleMatriz, ListaNodosMatriz))
-                    ListaDeListas.append(Lista(NombreLista, FormaLista, DobleLista, ListaDeNodos))
                     GraficaMatriz(ListaDeMatrices, NodoDefecto)
             elif Estado_Tipo == "tabla":
-                pass
+                if char == "(" and Estado_Cadena == "ninguno":
+                    Estado_Cadena = "apertura_especificaciones"
+                    Cadena = ""
+                elif Estado_Cadena == "ninguno" and re.match(PatternDefecto, Cadena):
+                    Cadena = ""
+                    Estado_Cadena = "defecto_nodo"
+                elif (char == "(" or char == " ") and Estado_Cadena == "ninguno":
+                    print("Se repite " + Cadena)
+                elif char == "," and Estado_Cadena == "apertura_especificaciones":
+                    Estado_Cadena = "apertura_especificaciones"
+                    ColumnasTabla = int(Cadena)
+                    Cadena = ""
+                elif (ord(char) == 34 or ord(char) == 39) and Estado_Cadena == "apertura_especificaciones":
+                    Estado_Cadena = "nombre_tabla"
+                elif (ord(char) == 34 or ord(char) == 39) and Estado_Cadena == "nombre_tabla":
+                    Estado_Cadena = "ninguno"
+                    NombreTabla = Cadena
+                    Cadena = ""
+                elif Estado_Cadena == "ninguno" and char == ")":
+                    Estado_Cadena = "cerradura_especificaciones"
+                    Cadena = ""
+                elif Estado_Cadena == "cerradura_especificaciones":
+                    if char == "{":
+                        Estado_Cadena = "apertura_nodos"
+                        Cadena = ""
+                    else:
+                        if char == " ":
+                            pass
+                        else:
+                            if char != " " and char != "\n":
+                                print("Se esperaba {: " + char)
+                elif Estado_Cadena == "apertura_nodos":
+                    if char == "(":
+                        if re.match(PatternFila, Cadena):
+                            Estado_Cadena = "fila"
+                            Cadena = ""
+                        elif re.match(PatternEncabezados, Cadena):
+                            Estado_Cadena = "encabezados"
+                            Cadena = ""
+                        else:
+                            print("Error: "+Cadena)
+                    elif char == "}":
+                        Estado_Tipo = "defecto_matriz"
+                        Estado_Cadena = "ninguno"
+                        Cadena = ""
+                    elif char == " " and Cadena != "":
+                        if re.match(PatternFila, Cadena):
+                            continue
+                        elif re.match(PatternEncabezados, Cadena):
+                            continue
+                        else:
+                            print("Error: "+Cadena)
+                            Cadena = ""
+                elif Estado_Cadena == "encabezados":
+                    if (ord(char) == 34 or ord(char) == 39):
+                        Estado_Cadena = "nombre_nodo_encabezado"
+                        Cadena = ""
+                elif Estado_Cadena == "nombre_nodo_encabezado":
+                    if char == "," or char == ")":
+                        ListaDeNombresFila.append(Cadena)
+                        Cadena = ""
+                        if char == ")":
+                            Estado_Cadena = "color_nodo_encabezado"
+                elif Estado_Cadena == "color_nodo_encabezado" and char == ";":
+                    Estado_Cadena = "apertura_nodos"
+                    if Cadena == "#":
+                        Encabezado.append(filatabla(ListaDeNombresFila, Cadena))
+                    else:
+                        Encabezado.append(filatabla(ListaDeNombresFila, RevisionColor(Cadena)))
+                    NombreNodos = ""
+                    ListaDeNombresFila = []
+                    Cadena = ""
+                elif Estado_Cadena == "fila":
+                    if (ord(char) == 34 or ord(char) == 39):
+                        Estado_Cadena = "nombre_nodo"
+                        Cadena = ""
+                elif Estado_Cadena == "nombre_nodo":
+                    if char == "," or char == ")":
+                        ListaDeNombresFila.append(Cadena)
+                        Cadena = ""
+                        if char == ")":
+                            Estado_Cadena = "color_nodo"
+                elif Estado_Cadena == "color_nodo" and char == ";":
+                    Estado_Cadena = "apertura_nodos"
+                    if Cadena == "#":
+                        ListaDeFilasTabla.append(filatabla(ListaDeNombresFila, Cadena))
+                    else:
+                        ListaDeFilasTabla.append(filatabla(ListaDeNombresFila, RevisionColor(Cadena)))
+                    NombreNodos = ""
+                    ListaDeNombresFila = []
+                    Cadena = ""
+
+            if Estado_Tipo == "defecto_matriz" and ListaDeFilasTabla != []:
+                if re.match(PatternDefecto, Cadena):
+                    Estado_Cadena = "defecto_nodo"
+                    Cadena = ""
+                elif Estado_Cadena == "defecto_nodo" and NombreNodos == "":
+                    if (ord(char) == 34 or ord(char) == 39):
+                        Estado_Cadena = "nombre_nodo"
+                        Cadena = ""
+                elif Estado_Cadena == "nombre_nodo":
+                    if (ord(char) == 34 or ord(char) == 39):
+                        NombreNodos = Cadena
+                        Estado_Cadena = "color_nodo"
+                        Cadena = ""
+                elif Estado_Cadena == "color_nodo" and char == ";":
+                    NodoDefecto = NodoLista(NombreNodos, RevisionColor(Cadena))
+                    Estado_Cadena = "ninguno"
+                    Estado_Tipo = "ninguno"
+                    NombreNodos = ""
+                    CantidadNodos = 0
+                    Cadena = ""
+                    ListaDeTablas.append(Tabla(ColumnasTabla, NombreTabla, ListaDeFilasTabla))
+                    GraficarTablas(ListaDeTablas, NodoDefecto, Encabezado)

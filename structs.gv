@@ -1,0 +1,10 @@
+digraph structs {
+	node [shape=plaintext]
+	struct2 [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+          <TR>
+            <TD>Equipo</TD><TD>ColorAsignado</TD><TD>No.Integrantes</TD>
+          </TR>
+            <TR><TD>Equipo1</TD><TD>Azul</TD><TD>7</TD></TR><TR><TD>Disponible</TD><TD>a</TD><TD>d</TD></TR><TR><TD>Equipo3</TD><TD>Rojo</TD><TD>a</TD></TR><TR><TD>Equipo4</TD><TD>a</TD><TD>6</TD></TR>
+        </TABLE>>]
+}
