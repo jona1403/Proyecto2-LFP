@@ -1,7 +1,0 @@
-tabla (3,'** Equipos **'){
-    fila ('Equipo 1', 'Azul', '7') Azul2;
-    fila ('Disponible', 'a', 'd') #;
-    fila ('Equipo 3', 'Rojo', 'a') Rojo2;
-    fila ('Equipo 4',"a",'6')#;
-    encabezados ('Equipo','Color Asignado','No. Integrantes') amarillo2;
-} defecto ('---') gris2;

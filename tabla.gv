@@ -1,9 +1,0 @@
-digraph tabla {
-	node [shape=plaintext]
-	struct1 [label="<<TABLE BORDER = \"0\" CELLBORDER= \"1\" CELLSPACING = \"0\">
-        <TR>
-            ['Equipo', 'ColorAsignado', 'No.Integrantes']
-        </TR>
-        "]
-	overlap=false
-}

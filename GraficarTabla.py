@@ -1,17 +1,23 @@
 from graphviz import Digraph
-from Clases import NodoMatriz
 def juntar(lista):
     dato = ""
+    dato +="<TR><TD>No.</TD>"
     for i in lista:
         dato+="<TD>"+i+"</TD>"
+    dato += "</TR>"
     return dato
 
-def JuntarCuerpo(lista):
+def JuntarCuerpo(lista, nododefecto):
+    incremento = 0
     dato = ""
     for filas in lista:
-        dato+= "<TR>"
+        incremento += 1
+        dato+= "<TR><TD>"+str(incremento)+"</TD>"
         for i in filas.listanombres:
-            dato += "<TD>" + i + "</TD>"
+            if i == "#":
+                dato += "<TD>" + nododefecto.nombre + "</TD>"
+            else:
+                dato += "<TD>" + i + "</TD>"
         dato += "</TR>"
     return dato
 
@@ -19,14 +25,16 @@ def GraficarTablas(ListaDeTablas, nododefecto, Encabezado):
     encabezado = ""
     cuerpo = ""
     for i in ListaDeTablas:
-        s = Digraph('structs', node_attr={'shape': 'plaintext'}, format="png")
+        s = Digraph('structs', node_attr={'shape': 'plaintext'}, format="svg")
+        for k in i.listafilas:
+            if len(k.listanombres) < i.columnas:
+                while len(k.listanombres) < i.columnas:
+                    k.listanombres.append(nododefecto.nombre)
         encabezado = juntar(Encabezado[0].listanombres)
-        cuerpo = JuntarCuerpo(i.listafilas)
+        cuerpo = JuntarCuerpo(i.listafilas, nododefecto)
         s.node('struct2', f'''<
         <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
-          <TR>
             {encabezado}
-          </TR>
             {cuerpo}
         </TABLE>>''')
 

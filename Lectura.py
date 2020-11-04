@@ -1,11 +1,15 @@
 from Clases import Lista, NodoLista, RevisionForma, RevisionColor
 from Clases import Matriz, NodoMatriz
 from Clases import Tabla, filatabla
-from GraficarLista import GraficarListas
-from GraficarMatriz import GraficaMatriz
-from GraficarTabla import GraficarTablas
+from ReporteTokens import Reportes
 import re
 def Lectura_De_Archivo(Ruta):
+    ListaDeTokens = []
+    ListaDeErrores = []
+    NoError = 0
+    NoToken = 0
+    ListaDeErrores.append(["No", "Línea", "Columna", "Descripción"])
+    ListaDeTokens.append(["No", "Línea", "Columna", "Lexema", "Token"])
     ListaDeListas = []
     ListaDeMatrices = []
     ListaDeTablas = []
@@ -71,16 +75,26 @@ def Lectura_De_Archivo(Ruta):
                         Estado_Tipo = "matriz"
                     elif re.match(PatternTabla, Cadena):
                         Estado_Tipo = "tabla"
+                    NoToken += 1
+                    ListaDeTokens.append([str(NoToken), str(Fila), str(Columna-len(Cadena)+1), Cadena, Cadena.lower()])
+                    ListaDeTokens.append(["No", "Línea", "Columna", "Lexema", "Token"])
                     Cadena = ""
                 else:
                     if char == " " or char == "\n":
+                        NoError+=1
+                        ListaDeErrores.append([str(NoError), str(Fila), str(Columna-len(Cadena)+1), Cadena])
                         print("Cadena inesperada")
                         Cadena = ""
             elif Estado_Tipo == "lista":
                 if char == "(" and Estado_Cadena == "ninguno":
+                    NoToken += 1
+                    ListaDeTokens.append([str(NoToken), str(Fila), str(Columna), char, Cadena.lower()])
                     Estado_Cadena = "apertura_especificaciones"
                     Cadena = ""
                 elif Estado_Cadena == "ninguno" and re.match(PatternDefecto, Cadena):
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, Cadena.lower()])
                     Cadena = ""
                     Estado_Cadena = "defecto_nodo"
                 elif (char == "(" or char == " ") and Estado_Cadena == "ninguno":
@@ -88,12 +102,21 @@ def Lectura_De_Archivo(Ruta):
                 elif (ord(char) == 34 or ord(char) == 39) and Estado_Cadena == "apertura_especificaciones":
                     Estado_Cadena = "nombre_lista"
                 elif (ord(char) == 34 or ord(char) == 39) and Estado_Cadena == "nombre_lista":
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Cadena nombre lista"])
                     Estado_Cadena = "ninguno"
                     NombreLista = Cadena
                     Cadena = ""
                 elif char == "," and Estado_Cadena == "ninguno" and NombreLista != "":
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), char, char])
                     Estado_Cadena = "forma_lista"
                 elif char == "," and Estado_Cadena == "forma_lista" and NombreLista !="":
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, Cadena.lower()])
                     Estado_Cadena = "ninguno"
                     FormaLista = RevisionForma(Cadena)
                     if FormaLista == "nomatch":
@@ -103,16 +126,29 @@ def Lectura_De_Archivo(Ruta):
                     Cadena = ""
                 elif Estado_Cadena == "ninguno" and FormaLista != "":
                     Estado_Cadena = "lista_doble"
+                    if char == ",":
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna), char, char])
                 elif char == ")" and Estado_Cadena == "lista_doble" and FormaLista != "":
                     Estado_Cadena = "cerradura_especificaciones"
                     if re.match(PatternFalse, Cadena):
                         DobleLista = False
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, Cadena.lower()])
                         Cadena = ""
                     elif re.match(PatternVerdadero, Cadena):
                         DobleLista = True
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, Cadena.lower()])
                         Cadena = ""
                 elif Estado_Cadena == "cerradura_especificaciones":
                     if char == "{":
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna), char, char])
                         Estado_Cadena = "apertura_nodos"
                         Cadena = ""
                     else:
@@ -123,15 +159,27 @@ def Lectura_De_Archivo(Ruta):
                                 print("Se esperaba {: "+char)
                 elif Estado_Cadena == "apertura_nodos":
                     if char == "(":
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna), char, char])
                         if re.match(PatternNodos, Cadena):
+                            NoToken += 1
+                            ListaDeTokens.append(
+                                [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, Cadena.lower()])
                             Estado_Cadena = "nodos"
                             Cadena = ""
                         elif re.match(PatternNodo, Cadena):
+                            NoToken += 1
+                            ListaDeTokens.append(
+                                [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, Cadena.lower()])
                             Estado_Cadena = "nodo"
                             Cadena = ""
                         else:
                             print("Error: "+Cadena)
                     elif char == "}":
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna), char, char])
                         Estado_Tipo = "defecto_lista"
                         Estado_Cadena = "ninguno"
                         Cadena = ""
@@ -144,14 +192,23 @@ def Lectura_De_Archivo(Ruta):
                 elif Estado_Cadena == "nodo" or Estado_Cadena == "nodos":
                     if Estado_Cadena == "nodo":
                         if (ord(char) == 34 or ord(char) == 39):
+                            NoToken += 1
+                            ListaDeTokens.append(
+                                [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Nombre nodo"])
                             Estado_Cadena = "nombre_nodo"
                             Cadena = ""
                         elif Cadena == "#" and char == "#":
+                            NoToken += 1
+                            ListaDeTokens.append(
+                                [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Nombre nodo defecto"])
                             NombreNodos = Cadena
                             Cadena = ""
                             Estado_Cadena = "color_nodo"
                     if Estado_Cadena == "nodos":
                         if (ord(char) == 34 or ord(char) == 39):
+                            NoToken += 1
+                            ListaDeTokens.append(
+                                [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Cantidad de nodos"])
                             Estado_Cadena = "nombre_nodo"
                             CantidadNodos = int(Cadena)
                             Cadena = ""
@@ -160,12 +217,18 @@ def Lectura_De_Archivo(Ruta):
                             for i in Cadena:
                                 if re.match(PatternNumeros, i) and i != "#":
                                     numaux+=i
+                            NoToken += 1
+                            ListaDeTokens.append(
+                                [str(NoToken), str(Fila), str(Columna - len(numaux) + 1), numaux, "Cantidad de nodos"])
                             CantidadNodos = int(numaux)
                             NombreNodos = "#"
                             Cadena = ""
                             Estado_Cadena = "color_nodo"
                 elif Estado_Cadena == "nombre_nodo":
                     if (ord(char) == 34 or ord(char) == 39):
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Nombre nodo"])
                         NombreNodos = Cadena
                         Estado_Cadena = "color_nodo"
                         Cadena = ""
@@ -177,6 +240,9 @@ def Lectura_De_Archivo(Ruta):
                         else:
                             ListaDeNodos.append(NodoLista(NombreNodos, RevisionColor(Cadena)))
                         NombreNodos = ""
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Color nodo"])
                         CantidadNodos = 0
                         Cadena = ""
                     else:
@@ -187,10 +253,16 @@ def Lectura_De_Archivo(Ruta):
                             else:
                                 ListaDeNodos.append(NodoLista(NombreNodos+str(i), RevisionColor(Cadena)))
                         NombreNodos = ""
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Color nodo"])
                         CantidadNodos = 0
                         Cadena = ""
             if Estado_Tipo == "defecto_lista" and ListaDeNodos != []:
                 if re.match(PatternDefecto, Cadena):
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Defecto"])
                     Estado_Cadena = "defecto_nodo"
                     Cadena = ""
                 elif Estado_Cadena == "defecto_nodo" and NombreNodos == "":
@@ -199,10 +271,16 @@ def Lectura_De_Archivo(Ruta):
                         Cadena = ""
                 elif Estado_Cadena == "nombre_nodo":
                     if (ord(char) == 34 or ord(char) == 39):
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Nombre defecto"])
                         NombreNodos = Cadena
                         Estado_Cadena = "color_nodo"
                         Cadena = ""
                 elif Estado_Cadena == "color_nodo" and char == ";":
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Color defecto"])
                     NodoDefecto = NodoLista(NombreNodos, RevisionColor(Cadena))
                     Estado_Cadena = "ninguno"
                     Estado_Tipo = "ninguno"
@@ -210,9 +288,14 @@ def Lectura_De_Archivo(Ruta):
                     CantidadNodos = 0
                     Cadena = ""
                     ListaDeListas.append(Lista(NombreLista, FormaLista, DobleLista, ListaDeNodos))
-                    GraficarListas(ListaDeListas, NodoDefecto)
+                    Reportes(ListaDeTokens)
+                    return ListaDeListas, NodoDefecto, Encabezado
+                    #GraficarListas(ListaDeListas, NodoDefecto)
             elif Estado_Tipo == "matriz":
                 if char == "(" and Estado_Cadena == "ninguno":
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna), char, char])
                     Estado_Cadena = "apertura_especificaciones"
                     Cadena = ""
                 elif Estado_Cadena == "ninguno" and re.match(PatternDefecto, Cadena):
@@ -222,21 +305,39 @@ def Lectura_De_Archivo(Ruta):
                     print("Se repite " + Cadena)
                 elif char == "," and Estado_Cadena == "apertura_especificaciones":
                     Estado_Cadena = "columnas_matriz"
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Filas matriz"])
                     FilasMatriz = int(Cadena)
                     Cadena = ""
                 elif char == "," and Estado_Cadena == "columnas_matriz":
                     Estado_Cadena = "apertura_especificaciones"
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Columnas matriz"])
                     ColumnasMatriz = int(Cadena)
                     Cadena = ""
                 elif (ord(char) == 34 or ord(char) == 39) and Estado_Cadena == "apertura_especificaciones":
                     Estado_Cadena = "nombre_matriz"
                 elif (ord(char) == 34 or ord(char) == 39) and Estado_Cadena == "nombre_matriz":
                     Estado_Cadena = "ninguno"
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Nombre matriz"])
                     NombreMatriz = Cadena
                     Cadena = ""
                 elif char == "," and Estado_Cadena == "ninguno" and NombreMatriz != "":
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna), char, char])
                     Estado_Cadena = "forma_matriz"
                 elif char == "," and Estado_Cadena == "forma_matriz" and NombreMatriz != "":
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Forma matriz"])
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna), char, char])
                     Estado_Cadena = "ninguno"
                     FormaMatriz = RevisionForma(Cadena)
                     if FormaMatriz == "nomatch":
@@ -247,15 +348,27 @@ def Lectura_De_Archivo(Ruta):
                 elif Estado_Cadena == "ninguno" and FormaMatriz != "":
                     Estado_Cadena = "matriz_doble"
                 elif char == ")" and Estado_Cadena == "matriz_doble" and FormaMatriz != "":
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna), char, char])
                     Estado_Cadena = "cerradura_especificaciones"
                     if re.match(PatternFalse, Cadena):
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Matriz doble"])
                         DobleMatriz = False
                         Cadena = ""
                     elif re.match(PatternVerdadero, Cadena):
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Matriz doble"])
                         DobleMatriz = True
                         Cadena = ""
                 elif Estado_Cadena == "cerradura_especificaciones":
                     if char == "{":
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna), char, char])
                         Estado_Cadena = "apertura_nodos"
                         Cadena = ""
                     else:
@@ -266,15 +379,27 @@ def Lectura_De_Archivo(Ruta):
                                 print("Se esperaba {: " + char)
                 elif Estado_Cadena == "apertura_nodos":
                     if char == "(":
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna), char, char])
                         if re.match(PatternFila, Cadena):
+                            NoToken += 1
+                            ListaDeTokens.append(
+                                [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "fila"])
                             Estado_Cadena = "fila"
                             Cadena = ""
                         elif re.match(PatternNodo, Cadena):
+                            NoToken += 1
+                            ListaDeTokens.append(
+                                [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, Cadena.lower()])
                             Estado_Cadena = "nodo"
                             Cadena = ""
                         else:
                             print("Error: "+Cadena)
                     elif char == "}":
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna), char, char])
                         Estado_Tipo = "defecto_matriz"
                         Estado_Cadena = "ninguno"
                         Cadena = ""
@@ -287,7 +412,13 @@ def Lectura_De_Archivo(Ruta):
                 elif Estado_Cadena == "nodo" or Estado_Cadena == "fila":
                     if Estado_Cadena == "nodo":
                         if char == ",":
+                            NoToken += 1
+                            ListaDeTokens.append(
+                                [str(NoToken), str(Fila), str(Columna), char, char])
                             Estado_Cadena = "y_matriz"
+                            NoToken += 1
+                            ListaDeTokens.append(
+                                [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "x_nodo"])
                             x_matriz = int(Cadena)
                             Cadena = ""
                     if Estado_Cadena == "fila":
@@ -296,16 +427,34 @@ def Lectura_De_Archivo(Ruta):
                             Cadena = ""
                 elif Estado_Cadena == "y_matriz":
                     if char == ",":
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna), char, char])
                         Estado_Cadena = "nombre_nodo"
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "y_nodo"])
                         y_matriz = int(Cadena)
                         Cadena = ""
                 elif Estado_Cadena == "nombre_nodo":
                     if char == "," or char == ")":
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna), char, char])
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Nombre nodo"])
                         ListaDeNombresMatriz.append(Cadena)
                         Cadena = ""
                         if char == ")":
                             Estado_Cadena = "color_nodo"
                 elif Estado_Cadena == "color_nodo" and char == ";":
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna), char, char])
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Color nodo"])
                     if len(ListaDeNombresMatriz) == 1:
                         Estado_Cadena = "apertura_nodos"
                         if Cadena == "#":
@@ -330,6 +479,9 @@ def Lectura_De_Archivo(Ruta):
                         Cadena = ""
             if Estado_Tipo == "defecto_matriz" and ListaNodosMatriz != []:
                 if re.match(PatternDefecto, Cadena):
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Defecto Matriz"])
                     Estado_Cadena = "defecto_nodo"
                     Cadena = ""
                 elif Estado_Cadena == "defecto_nodo" and NombreNodos == "":
@@ -338,10 +490,19 @@ def Lectura_De_Archivo(Ruta):
                         Cadena = ""
                 elif Estado_Cadena == "nombre_nodo":
                     if (ord(char) == 34 or ord(char) == 39):
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Nombre nodo defecto"])
                         NombreNodos = Cadena
                         Estado_Cadena = "color_nodo"
                         Cadena = ""
                 elif Estado_Cadena == "color_nodo" and char == ";":
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna), char, char])
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Color nodo defecto"])
                     NodoDefecto = NodoLista(NombreNodos, RevisionColor(Cadena))
                     Estado_Cadena = "ninguno"
                     Estado_Tipo = "ninguno"
@@ -349,9 +510,14 @@ def Lectura_De_Archivo(Ruta):
                     CantidadNodos = 0
                     Cadena = ""
                     ListaDeMatrices.append(Matriz(FilasMatriz, ColumnasMatriz, NombreMatriz, FormaMatriz, DobleMatriz, ListaNodosMatriz))
-                    GraficaMatriz(ListaDeMatrices, NodoDefecto)
+                    Reportes(ListaDeTokens)
+                    return ListaDeMatrices, NodoDefecto, Encabezado
+                    #GraficaMatriz(ListaDeMatrices, NodoDefecto)
             elif Estado_Tipo == "tabla":
                 if char == "(" and Estado_Cadena == "ninguno":
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna), char, char])
                     Estado_Cadena = "apertura_especificaciones"
                     Cadena = ""
                 elif Estado_Cadena == "ninguno" and re.match(PatternDefecto, Cadena):
@@ -360,6 +526,9 @@ def Lectura_De_Archivo(Ruta):
                 elif (char == "(" or char == " ") and Estado_Cadena == "ninguno":
                     print("Se repite " + Cadena)
                 elif char == "," and Estado_Cadena == "apertura_especificaciones":
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Columnas_tabla"])
                     Estado_Cadena = "apertura_especificaciones"
                     ColumnasTabla = int(Cadena)
                     Cadena = ""
@@ -367,13 +536,22 @@ def Lectura_De_Archivo(Ruta):
                     Estado_Cadena = "nombre_tabla"
                 elif (ord(char) == 34 or ord(char) == 39) and Estado_Cadena == "nombre_tabla":
                     Estado_Cadena = "ninguno"
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Nombre_tabla"])
                     NombreTabla = Cadena
                     Cadena = ""
                 elif Estado_Cadena == "ninguno" and char == ")":
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna), char, char])
                     Estado_Cadena = "cerradura_especificaciones"
                     Cadena = ""
                 elif Estado_Cadena == "cerradura_especificaciones":
                     if char == "{":
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna), char, char])
                         Estado_Cadena = "apertura_nodos"
                         Cadena = ""
                     else:
@@ -384,15 +562,27 @@ def Lectura_De_Archivo(Ruta):
                                 print("Se esperaba {: " + char)
                 elif Estado_Cadena == "apertura_nodos":
                     if char == "(":
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna), char, char])
                         if re.match(PatternFila, Cadena):
+                            NoToken += 1
+                            ListaDeTokens.append(
+                                [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, Cadena.lower()])
                             Estado_Cadena = "fila"
                             Cadena = ""
                         elif re.match(PatternEncabezados, Cadena):
+                            NoToken += 1
+                            ListaDeTokens.append(
+                                [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, Cadena.lower()])
                             Estado_Cadena = "encabezados"
                             Cadena = ""
                         else:
                             print("Error: "+Cadena)
                     elif char == "}":
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna), char, char])
                         Estado_Tipo = "defecto_matriz"
                         Estado_Cadena = "ninguno"
                         Cadena = ""
@@ -410,12 +600,24 @@ def Lectura_De_Archivo(Ruta):
                         Cadena = ""
                 elif Estado_Cadena == "nombre_nodo_encabezado":
                     if char == "," or char == ")":
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna), char, char])
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Nombre_nodo"])
                         ListaDeNombresFila.append(Cadena)
                         Cadena = ""
                         if char == ")":
                             Estado_Cadena = "color_nodo_encabezado"
                 elif Estado_Cadena == "color_nodo_encabezado" and char == ";":
                     Estado_Cadena = "apertura_nodos"
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna), char, char])
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Color nodo"])
                     if Cadena == "#":
                         Encabezado.append(filatabla(ListaDeNombresFila, Cadena))
                     else:
@@ -427,13 +629,31 @@ def Lectura_De_Archivo(Ruta):
                     if (ord(char) == 34 or ord(char) == 39):
                         Estado_Cadena = "nombre_nodo"
                         Cadena = ""
+                    elif char == "#":
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna), char, "nombre_nodo"])
+                        ListaDeNombresFila.append(Cadena)
+                        Cadena = ""
                 elif Estado_Cadena == "nombre_nodo":
                     if char == "," or char == ")":
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna), char, char])
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Nombre nodo"])
                         ListaDeNombresFila.append(Cadena)
                         Cadena = ""
                         if char == ")":
                             Estado_Cadena = "color_nodo"
                 elif Estado_Cadena == "color_nodo" and char == ";":
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna), char, char])
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "color_nodo"])
                     Estado_Cadena = "apertura_nodos"
                     if Cadena == "#":
                         ListaDeFilasTabla.append(filatabla(ListaDeNombresFila, Cadena))
@@ -442,10 +662,12 @@ def Lectura_De_Archivo(Ruta):
                     NombreNodos = ""
                     ListaDeNombresFila = []
                     Cadena = ""
-
             if Estado_Tipo == "defecto_matriz" and ListaDeFilasTabla != []:
                 if re.match(PatternDefecto, Cadena):
                     Estado_Cadena = "defecto_nodo"
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Defecto_nodo"])
                     Cadena = ""
                 elif Estado_Cadena == "defecto_nodo" and NombreNodos == "":
                     if (ord(char) == 34 or ord(char) == 39):
@@ -453,10 +675,19 @@ def Lectura_De_Archivo(Ruta):
                         Cadena = ""
                 elif Estado_Cadena == "nombre_nodo":
                     if (ord(char) == 34 or ord(char) == 39):
+                        NoToken += 1
+                        ListaDeTokens.append(
+                            [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Nombre nodo defecto"])
                         NombreNodos = Cadena
                         Estado_Cadena = "color_nodo"
                         Cadena = ""
                 elif Estado_Cadena == "color_nodo" and char == ";":
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna), char, char])
+                    NoToken += 1
+                    ListaDeTokens.append(
+                        [str(NoToken), str(Fila), str(Columna - len(Cadena) + 1), Cadena, "Color nodo defecto"])
                     NodoDefecto = NodoLista(NombreNodos, RevisionColor(Cadena))
                     Estado_Cadena = "ninguno"
                     Estado_Tipo = "ninguno"
@@ -464,4 +695,6 @@ def Lectura_De_Archivo(Ruta):
                     CantidadNodos = 0
                     Cadena = ""
                     ListaDeTablas.append(Tabla(ColumnasTabla, NombreTabla, ListaDeFilasTabla))
-                    GraficarTablas(ListaDeTablas, NodoDefecto, Encabezado)
+                    Reportes(ListaDeTokens)
+                    return ListaDeTablas, NodoDefecto, Encabezado
+                    #GraficarTablas(ListaDeTablas, NodoDefecto, Encabezado)

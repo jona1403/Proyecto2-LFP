@@ -1,4 +1,8 @@
 from Lectura import Lectura_De_Archivo
+from GraficarTabla import GraficarTablas
+from Clases import Matriz, Lista
+from GraficarMatriz import GraficaMatriz
+from GraficarLista import GraficarListas
 def menu():
     while True:
         print("-------------------------------------------------------")
@@ -12,10 +16,20 @@ def menu():
         entrada = input("Ingrese una opción: ")
         if entrada == "1":
             Ruta = input("Ingrese la ruta del archivo: ")
-            Lectura_De_Archivo(Ruta)
+            Lista, nododefecto, encabezado = Lectura_De_Archivo(Ruta)
             input()
         if entrada == "2":
-            print("Trabajamos en ello ;)")
+            if encabezado != []:
+                GraficarTablas(Lista, nododefecto, encabezado)
+                print("Gráfica generada con exito")
+            else:
+                if type(Lista[0]) is Matriz:
+                    GraficaMatriz(Lista, nododefecto)
+                    print("Gráfica generada con exito")
+                elif type(Lista[0]) is Lista:
+                    GraficarListas(Lista, nododefecto)
+                    print("Gráfica generada con exito")
+                pass
             input()
         if entrada == "3":
             print("Gracias, vuelva pronto :)")
