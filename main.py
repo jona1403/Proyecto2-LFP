@@ -3,6 +3,7 @@ from GraficarTabla import GraficarTablas
 from Clases import Matriz, Lista
 from GraficarMatriz import GraficaMatriz
 from GraficarLista import GraficarListas
+import os
 def menu():
     while True:
         print("-------------------------------------------------------")
@@ -16,7 +17,10 @@ def menu():
         entrada = input("Ingrese una opción: ")
         if entrada == "1":
             Ruta = input("Ingrese la ruta del archivo: ")
-            Lista, nododefecto, encabezado = Lectura_De_Archivo(Ruta)
+            if os.path.isfile(Ruta) and Ruta[-4:] == ".lfp":
+                Lista, nododefecto, encabezado = Lectura_De_Archivo(Ruta)
+            else:
+                print("El documento no existe o no es .lfp")
             input()
         if entrada == "2":
             if encabezado != []:

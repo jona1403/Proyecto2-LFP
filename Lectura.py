@@ -2,6 +2,7 @@ from Clases import Lista, NodoLista, RevisionForma, RevisionColor
 from Clases import Matriz, NodoMatriz
 from Clases import Tabla, filatabla
 from ReporteTokens import Reportes
+from ReporteErrores import ReporteErrores
 import re
 def Lectura_De_Archivo(Ruta):
     ListaDeTokens = []
@@ -98,7 +99,8 @@ def Lectura_De_Archivo(Ruta):
                     Cadena = ""
                     Estado_Cadena = "defecto_nodo"
                 elif (char == "(" or char == " ") and Estado_Cadena == "ninguno":
-                    print("Se repite "+Cadena)
+                    NoError += 1
+                    ListaDeErrores.append([str(NoError), str(Fila), str(Columna - len(Cadena) + 1), Cadena])
                 elif (ord(char) == 34 or ord(char) == 39) and Estado_Cadena == "apertura_especificaciones":
                     Estado_Cadena = "nombre_lista"
                 elif (ord(char) == 34 or ord(char) == 39) and Estado_Cadena == "nombre_lista":
@@ -120,7 +122,8 @@ def Lectura_De_Archivo(Ruta):
                     Estado_Cadena = "ninguno"
                     FormaLista = RevisionForma(Cadena)
                     if FormaLista == "nomatch":
-                        print("La forma ingresada por el usuario no es valida")
+                        NoError += 1
+                        ListaDeErrores.append([str(NoError), str(Fila), str(Columna - len(Cadena) + 1), Cadena])
                     else:
                         pass
                     Cadena = ""
@@ -156,7 +159,8 @@ def Lectura_De_Archivo(Ruta):
                             pass
                         else:
                             if char != " " and char != "\n":
-                                print("Se esperaba {: "+char)
+                                NoError += 1
+                                ListaDeErrores.append([str(NoError), str(Fila), str(Columna - len(Cadena) + 1), char])
                 elif Estado_Cadena == "apertura_nodos":
                     if char == "(":
                         NoToken += 1
@@ -175,7 +179,8 @@ def Lectura_De_Archivo(Ruta):
                             Estado_Cadena = "nodo"
                             Cadena = ""
                         else:
-                            print("Error: "+Cadena)
+                            NoError += 1
+                            ListaDeErrores.append([str(NoError), str(Fila), str(Columna - len(Cadena) + 1), Cadena])
                     elif char == "}":
                         NoToken += 1
                         ListaDeTokens.append(
@@ -187,7 +192,8 @@ def Lectura_De_Archivo(Ruta):
                         if re.match(PatternNodo, Cadena) or re.match(PatternNodos, Cadena):
                             continue
                         else:
-                            print("Error: "+Cadena)
+                            NoError += 1
+                            ListaDeErrores.append([str(NoError), str(Fila), str(Columna - len(Cadena) + 1), Cadena])
                             Cadena = ""
                 elif Estado_Cadena == "nodo" or Estado_Cadena == "nodos":
                     if Estado_Cadena == "nodo":
@@ -289,6 +295,7 @@ def Lectura_De_Archivo(Ruta):
                     Cadena = ""
                     ListaDeListas.append(Lista(NombreLista, FormaLista, DobleLista, ListaDeNodos))
                     Reportes(ListaDeTokens)
+                    ReporteErrores(ListaDeErrores)
                     return ListaDeListas, NodoDefecto, Encabezado
                     #GraficarListas(ListaDeListas, NodoDefecto)
             elif Estado_Tipo == "matriz":
@@ -341,7 +348,8 @@ def Lectura_De_Archivo(Ruta):
                     Estado_Cadena = "ninguno"
                     FormaMatriz = RevisionForma(Cadena)
                     if FormaMatriz == "nomatch":
-                        print("La forma ingresada por el usuario no es valida")
+                        NoError += 1
+                        ListaDeErrores.append([str(NoError), str(Fila), str(Columna - len(Cadena) + 1), Cadena])
                     else:
                         pass
                     Cadena = ""
@@ -376,7 +384,8 @@ def Lectura_De_Archivo(Ruta):
                             pass
                         else:
                             if char != " " and char != "\n":
-                                print("Se esperaba {: " + char)
+                                NoError += 1
+                                ListaDeErrores.append([str(NoError), str(Fila), str(Columna), char])
                 elif Estado_Cadena == "apertura_nodos":
                     if char == "(":
                         NoToken += 1
@@ -395,7 +404,8 @@ def Lectura_De_Archivo(Ruta):
                             Estado_Cadena = "nodo"
                             Cadena = ""
                         else:
-                            print("Error: "+Cadena)
+                            NoError += 1
+                            ListaDeErrores.append([str(NoError), str(Fila), str(Columna - len(Cadena) + 1), Cadena])
                     elif char == "}":
                         NoToken += 1
                         ListaDeTokens.append(
@@ -407,7 +417,8 @@ def Lectura_De_Archivo(Ruta):
                         if re.match(PatternNodo, Cadena) or re.match(PatternFila, Cadena):
                             continue
                         else:
-                            print("Error: "+Cadena)
+                            NoError += 1
+                            ListaDeErrores.append([str(NoError), str(Fila), str(Columna - len(Cadena) + 1), Cadena])
                             Cadena = ""
                 elif Estado_Cadena == "nodo" or Estado_Cadena == "fila":
                     if Estado_Cadena == "nodo":
@@ -511,6 +522,7 @@ def Lectura_De_Archivo(Ruta):
                     Cadena = ""
                     ListaDeMatrices.append(Matriz(FilasMatriz, ColumnasMatriz, NombreMatriz, FormaMatriz, DobleMatriz, ListaNodosMatriz))
                     Reportes(ListaDeTokens)
+                    ReporteErrores(ListaDeErrores)
                     return ListaDeMatrices, NodoDefecto, Encabezado
                     #GraficaMatriz(ListaDeMatrices, NodoDefecto)
             elif Estado_Tipo == "tabla":
@@ -559,7 +571,8 @@ def Lectura_De_Archivo(Ruta):
                             pass
                         else:
                             if char != " " and char != "\n":
-                                print("Se esperaba {: " + char)
+                                NoError += 1
+                                ListaDeErrores.append([str(NoError), str(Fila), str(Columna - len(Cadena) + 1), Cadena])
                 elif Estado_Cadena == "apertura_nodos":
                     if char == "(":
                         NoToken += 1
@@ -578,7 +591,8 @@ def Lectura_De_Archivo(Ruta):
                             Estado_Cadena = "encabezados"
                             Cadena = ""
                         else:
-                            print("Error: "+Cadena)
+                            NoError += 1
+                            ListaDeErrores.append([str(NoError), str(Fila), str(Columna - len(Cadena) + 1), Cadena])
                     elif char == "}":
                         NoToken += 1
                         ListaDeTokens.append(
@@ -592,7 +606,8 @@ def Lectura_De_Archivo(Ruta):
                         elif re.match(PatternEncabezados, Cadena):
                             continue
                         else:
-                            print("Error: "+Cadena)
+                            NoError += 1
+                            ListaDeErrores.append([str(NoError), str(Fila), str(Columna - len(Cadena) + 1), Cadena])
                             Cadena = ""
                 elif Estado_Cadena == "encabezados":
                     if (ord(char) == 34 or ord(char) == 39):
@@ -696,5 +711,6 @@ def Lectura_De_Archivo(Ruta):
                     Cadena = ""
                     ListaDeTablas.append(Tabla(ColumnasTabla, NombreTabla, ListaDeFilasTabla))
                     Reportes(ListaDeTokens)
+                    ReporteErrores(ListaDeErrores)
                     return ListaDeTablas, NodoDefecto, Encabezado
                     #GraficarTablas(ListaDeTablas, NodoDefecto, Encabezado)
